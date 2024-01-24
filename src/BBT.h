@@ -11,12 +11,7 @@
 class Input;
 class AncestryGraph;
 
-struct BBT {
-    std::list<std::pair<int,int> > arcs;
-//    std::list<BBT>::iterator branch_begin,brach_end;
-//    std::list<std::pair<int,int> > ad_pairs;
-};
-
+typedef std::list<std::pair<int,int> > BBT;
 //void bulid_AD_pairs(int n, BBT &A);
 
 bool BBT_check(const Input &input, const BBT &bbt);

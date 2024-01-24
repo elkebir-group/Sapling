@@ -8,7 +8,7 @@
 #include "Input.h"
 #include "AncestryGraph.h"
 
-#include "gurobi_c++.h"
+#include <gurobi_c++.h>
 
 extern float EPS;
 
@@ -151,7 +151,7 @@ bool BBT_check_AD(const Input& data, const BBT &bbt){
 
 //    bulid_AD_pairs(data.n,bbt);
 
-    for (auto it:bbt.arcs){
+    for (auto it:bbt){
         model.addConstr(ad[it.first][it.second]>=1);
     }
 
@@ -189,7 +189,7 @@ void BBT_hc::_hc(int depth) {
         for (auto &t: hc[depth]) {
             for (auto p: GF.possible_parent[i]) {
                 tmp = t;
-                tmp.arcs.emplace_back(p, i);
+                tmp.emplace_back(p, i);
                 if (BBT_check(GF.data, tmp))
                     res.push_back(tmp);
             }

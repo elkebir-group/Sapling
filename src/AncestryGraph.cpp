@@ -4,7 +4,6 @@
 
 #include "AncestryGraph.h"
 #include "Input.h"
-#include "BBT.h"
 
 extern float EPS;
 
@@ -57,7 +56,7 @@ parent(data.n,-1) {
             remainder[i][j] = data.data[i][j];
         }
     }
-    for (auto a:bbt.arcs){
+    for (auto a:bbt){
         parent[a.second]=a.first;
         for (auto i = 0; i < data.m; ++i) {
             remainder[i][a.first]-=data.data[i][a.second];

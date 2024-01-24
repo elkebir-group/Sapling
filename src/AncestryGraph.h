@@ -19,7 +19,8 @@ struct AncestryGraph {
     std::vector<std::pair<int,int> > arc_set;
 };
 
-class BBT;
+typedef std::list<std::pair<int,int> > BBT;
+
 struct AncestryGraph_BBT: public AncestryGraph{
     std::vector<std::vector<double > >  remainder;
     std::vector<int> parent;
