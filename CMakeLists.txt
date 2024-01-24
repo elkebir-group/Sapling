@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 project(BBT)
 
-
-
-
 set(CMAKE_CXX_STANDARD 20)
 set(CXX 1)
 
@@ -19,13 +16,12 @@ include_directories(${BOOST_INCLUDE_DIRS} ${GUROBI_INCLUDE_DIRS})
 
 set( CommonLibs m ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY} )
 
-
 link_libraries(${CommonLibs} Boost::boost pybind11::pybind11)
 
 add_executable(BBT src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h src/main.cpp src/LLH.cpp src/LLH.h)
 
 add_subdirectory(pybind11)
-pybind11_add_module(pyBBT src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h  src/pymain.cpp)
+pybind11_add_module(pyBBT MODULE src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h  src/pymain.cpp)
 
 ## EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 ## define (VERSION_INFO) here.

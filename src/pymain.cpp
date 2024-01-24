@@ -47,9 +47,9 @@ double maxLLH::LLH_SNV(const Tree & T){
 }
 
 
-PYBIND11_MODULE(pyBBT, m) {
-    py::class_<Fcase>(m,"case").def(py::init<int,const std::vector<std::vector<double> > >())
+PYBIND11_MODULE(pyBBT, MODULE) {
+    py::class_<Fcase>(MODULE, "case").def(py::init<int,const std::vector<std::vector<double> > >())
                         .def("verify_BBT", &Fcase::verify_BBT);
-    py::class_<maxLLH>(m, "maxllh").def(py::init<IM,IM,int,double>())
+    py::class_<maxLLH>(MODULE, "maxllh").def(py::init<IM,IM,int,double>())
                         .def("llh_snv",&maxLLH::LLH_SNV);
 }
