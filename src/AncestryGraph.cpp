@@ -4,6 +4,7 @@
 
 #include "AncestryGraph.h"
 #include "Input.h"
+#include <algorithm>
 
 extern float EPS;
 
