@@ -19,7 +19,8 @@ include_directories(${BOOST_INCLUDE_DIRS} ${GUROBI_INCLUDE_DIRS})
 
 set( CommonLibs m ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARY} )
 
-link_libraries(${CommonLibs} Boost::boost )
+
+link_libraries(${CommonLibs} Boost::boost pybind11::pybind11)
 
 add_executable(BBT src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h src/main.cpp src/LLH.cpp src/LLH.h)
 

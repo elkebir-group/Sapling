@@ -27,6 +27,7 @@ Fcase::Fcase(int seed, const std::vector<std::vector<double> > &F) {
 
 bool Fcase::verify_BBT(const std::list<std::pair<int, int> > &edges){
     auto a = BBT_check_AD(*F,BBT({edges}));
+    return a;
 }
 
 
