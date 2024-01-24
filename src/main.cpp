@@ -25,7 +25,7 @@ int main(int argc, char ** argv) {
         printf("%d\n", a.size());
         for (auto &T:a){
             printf("[");
-            for(auto arc:T.arcs)
+            for(auto arc:T)
                 printf("(%d,%d),",arc.first,arc.second);
             printf("]\n");
         }
