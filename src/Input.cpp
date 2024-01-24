@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <list>
+#include <algorithm>
 
 Input::Input(const std::string &filename, int r): r(r) {
     std::ifstream fin(filename);
