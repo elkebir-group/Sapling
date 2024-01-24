@@ -12,7 +12,7 @@ typedef std::list<std::pair<int,int> > Tree;
 typedef std::vector<std::vector<int> > IM;
 
 class LLH {
-private:
+public:
     std::vector<std::vector<double> > F_upper, F_lower;
     std::vector<std::vector<std::vector<double> > > split;
     IM var,ref,tot;
@@ -21,10 +21,11 @@ private:
     std::vector<std::list<int> > PP,PC;
 
     int n_intervals;
+    int arc_size;
+    std::vector<std::pair<int,int> > arc_set;
+    std::vector<std::vector<int> > arc_set_idx;
 
 //    double alpha_SNV,alpha_Meth;
-
-public :
 
 //    static void generate_splits(int var, int ref, double lower, double uppper, double alpha, int n_interval, std::vector<double> & split);
 
@@ -32,7 +33,11 @@ public :
     double LLH_SNV(const Tree & T,
                    std::vector<std::vector<double> > & result_usage,
                    std::vector<std::vector<double> > & result_f_snv);
-//                   Tree & result_t);
+
+    double LLH_SNV_t(const Tree & T,
+                   std::vector<std::vector<double> > & result_usage,
+                   std::vector<std::vector<double> > & result_f_snv,
+                   Tree & result_t);
 };
 
 
