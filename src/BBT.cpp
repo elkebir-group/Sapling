@@ -142,7 +142,7 @@ bool BBT_check_AD(const Input& data, const BBT &bbt){
                 model.addConstr(ad[i][j] >= adp[i][j][mid]);
                 model.addConstr(adp[i][j][mid]>=ad[i][mid]+arc[GF.arc_set_index[mid][j]]-1);
                 model.addConstr(adp[i][j][mid]<=ad[i][mid]);
-                model.addConstr(adp[i][j][mid]<=arc[GF.arc_set_index[mid][j]]-1);
+                model.addConstr(adp[i][j][mid]<=arc[GF.arc_set_index[mid][j]]);
             }
             model.addConstr(ad[i][j]<=sum);
             sum.clear();

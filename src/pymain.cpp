@@ -9,7 +9,7 @@
 #include <vector>
 #include <list>
 #include <pybind11/pybind11.h>
-//#include <pybind11/stl.h>
+#include <pybind11/stl.h>
 
 float EPS;
 
@@ -49,6 +49,13 @@ struct maxLLH{
     maxLLH(const py::list& Var, const py::list& Tot, int n_intervals, double alpha);
     double LLH_SNV_(const py::list & T);
     double LLH_SNV_t_(const py::list & partial_T);
+    double LLH_SNV_adt_(const py::list & partial_T);
+    const std::vector<std::vector<double> > & freq(){
+        return *rp_f_snv;
+    }
+    const Tree &tree(){
+        return  *T;
+    }
     ~maxLLH();
 };
 
@@ -76,7 +83,7 @@ double maxLLH::LLH_SNV_(const py::list & T){
     for(auto & edge:T){
         casted.push_back(edge.cast<std::pair<int,int> >());
     }
-    return llh->LLH_SNV(casted,*rp_f_snv,*rp_usage);
+    return llh->LLH_SNV(casted,*rp_usage,*rp_f_snv);
 }
 
 double maxLLH::LLH_SNV_t_(const py::list &partial_T) {
@@ -85,7 +92,16 @@ double maxLLH::LLH_SNV_t_(const py::list &partial_T) {
     for(auto & edge:partial_T){
         casted.push_back(edge.cast<std::pair<int,int> >());
     }
-    return llh->LLH_SNV_t(casted,*rp_f_snv, *rp_usage, *T);
+    return llh->LLH_SNV_t(casted, *rp_usage,*rp_f_snv, *T);
+}
+
+double maxLLH::LLH_SNV_adt_(const py::list &partial_T) {
+    Tree casted;
+    std::vector<int> tmp;
+    for(auto & edge:partial_T){
+        casted.push_back(edge.cast<std::pair<int,int> >());
+    }
+    return llh->LLH_SNV_adt(casted, *rp_usage,*rp_f_snv, *T);
 }
 
 maxLLH::~maxLLH() {
@@ -100,5 +116,10 @@ PYBIND11_MODULE(pyBBT, MODULE) {
 //    py::class_<Fcase>(MODULE, "case").def(py::init<py::list >())
 //            .def("verify_BBT", &Fcase::verify_BBT);
     py::class_<maxLLH>(MODULE, "maxllh").def(py::init<py::list,py::list,int,double>())
-            .def("llh_snv",&maxLLH::LLH_SNV_);
+            .def("llh_snv",&maxLLH::LLH_SNV_)
+            .def("llh_snv_t",&maxLLH::LLH_SNV_t_)
+            .def("llh_snv_adt",&maxLLH::LLH_SNV_adt_)
+            .def("freq",&maxLLH::freq)
+            .def("tree",&maxLLH::tree);
+
 }

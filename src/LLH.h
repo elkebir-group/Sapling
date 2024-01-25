@@ -29,7 +29,7 @@ public:
 
 //    static void generate_splits(int var, int ref, double lower, double uppper, double alpha, int n_interval, std::vector<double> & split);
 
-    explicit LLH(IM Var, IM Tot, int n_intervals=100, double alpha=1);//, double alpha_snv=-1, double alpha_meth=-1);
+    LLH(IM Var, IM Tot, int n_intervals=100, double alpha=1);//, double alpha_snv=-1, double alpha_meth=-1);
     double LLH_SNV(const Tree & T,
                    std::vector<std::vector<double> > & result_usage,
                    std::vector<std::vector<double> > & result_f_snv);
@@ -38,6 +38,10 @@ public:
                    std::vector<std::vector<double> > & result_usage,
                    std::vector<std::vector<double> > & result_f_snv,
                    Tree & result_t);
+    double LLH_SNV_adt(const Tree & T,
+                     std::vector<std::vector<double> > & result_usage,
+                     std::vector<std::vector<double> > & result_f_snv,
+                     Tree & result_t);
 };
 
 
