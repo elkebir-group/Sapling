@@ -23,9 +23,9 @@ link_libraries(${CommonLibs}  pybind11::pybind11)
 
 add_executable(BBT src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h src/main.cpp src/LLH.cpp src/LLH.h)
 
-add_executable(test src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h src/main2.cpp src/LLH.cpp src/LLH.h)
+#add_executable(test src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h src/main2.cpp src/LLH.cpp src/LLH.h)
 
-pybind11_add_module(pyBBT MODULE src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h src/LLH.cpp src/LLH.h src/pymain.cpp)
+pybind11_add_module(pyBBT MODULE src/pymain.cpp src/Input.h src/Input.cpp src/AncestryGraph.cpp src/AncestryGraph.h src/BBT.cpp src/BBT.h src/LLH.cpp src/LLH.h)
 
 ## EXAMPLE_VERSION_INFO is defined by setup.py and passed into the C++ code as a
 ## define (VERSION_INFO) here.
