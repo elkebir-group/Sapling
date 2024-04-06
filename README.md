@@ -2,6 +2,7 @@
 
 Sapling is a method that infers a small set of backbone trees on a smaller subset of mutations that collectively summarize the entire set of possible phylogenies.
 Sapling can also grow a given backbone tree into a full phylogeny.
+![fig1](Figure1.png)
 
 ## Dependencies
 
