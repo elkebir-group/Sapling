@@ -64,6 +64,8 @@ Example command:
          output file
       -r str
          result file: output of the main program
+      -a float
+         rho: lower bound factor of likelihood
       -m
          allow multiple evolutions from germline (GL)
 
