@@ -20,6 +20,8 @@ The first line includes the names of the columns, the following colunms are requ
 - `depth` total reads 
 - `cluster_index`(optional) (0, 1, ..., k-1) for k clusters
 
+[Here](example/example.tsv) is an example of input. 
+
 The output is a text file.
 The first line includes the the number backbone trees, in the format of "# $\tau$ backbone trees". Depending on the size $\ell$ of the set of mutations covered in the backbone trees, for the following $\tau \times \ell$ lines, each $\ell$ lines conatins a 
 a tree.
@@ -49,7 +51,7 @@ More specifically, the first line of the $\ell$ lines includes the number mutati
 
 Example command:
 `python main.py -f example.tsv -o example.txt -a 0.9`
-
+[The output](example/example.txt) of the about command on the above example input.
 
 #### Expand backbone trees into full trees (greedy expand)
 
@@ -70,4 +72,5 @@ Example command:
          allow multiple evolutions from germline (GL)
 
 Example command
-`python greedy_expand.py -f example.tsv -r example.txt -o example.full.txt -a 0.9
+`python greedy_expand.py -f example.tsv -r example.txt -o example.full.txt -a 0.9`
+[The output](example/example.full.txt) of the about command on the example input using the output generated above.
