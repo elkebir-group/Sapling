@@ -74,4 +74,5 @@ Example command:
 
 Example command
 `python greedy_expand.py -f example.tsv -r example.txt -o example.full.txt -a 0.9`
+
 [The output](example/example.full.txt) of the above command on the example input using the output generated above.
