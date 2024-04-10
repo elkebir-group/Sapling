@@ -51,7 +51,8 @@ More specifically, the first line of the $\ell$ lines includes the number mutati
 
 Example command:
 `python main.py -f example.tsv -o example.txt -a 0.9`
-[The output](example/example.txt) of the about command on the above example input.
+
+[The output](example/example.txt) of the above command on the example input.
 
 #### Expand backbone trees into full trees (greedy expand)
 
@@ -73,4 +74,4 @@ Example command:
 
 Example command
 `python greedy_expand.py -f example.tsv -r example.txt -o example.full.txt -a 0.9`
-[The output](example/example.full.txt) of the about command on the example input using the output generated above.
+[The output](example/example.full.txt) of the above command on the example input using the output generated above.
