@@ -68,7 +68,6 @@ def mll(V,R,T,init_values):
         leq_idx+=1
     G=spmatrix(coef_list,leq_idx_list,idx_x_list)
     h=matrix(0.,(leq_idx,1) )
-    #diploid based TODO: support different copy number
     for i in range(len(V)):
         h[-1-i]=0.5
     res_solver = solvers.cp(F,G=G,h=h)

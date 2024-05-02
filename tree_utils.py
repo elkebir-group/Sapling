@@ -10,10 +10,10 @@ class Tree:
         label[-1] = -1
         self.edges_relabel_from_zero = tuple((label[e[0]],label[e[1]]) for e in self.edges)
         self.children = [[] for _ in range(self.n+1)]
-        # self.parent = [None for _ in range(n)]
+        
         for e in self.edges_relabel_from_zero:
             self.children[e[0]].append(e[1])
-            # self.parent[e[1]]=e[0]
+        
         self.subtree_size = [None for _ in range(self.n)]
         stack = [-1]
         r_order = []

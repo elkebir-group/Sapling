@@ -12,7 +12,7 @@ ell = int(parameter["l"])
 out = parameter["o"]
 
 EPS = 1e-3
-llh_EPS = 1e-3
+llh_EPS = 1e-4
 
 if "cluster_index" not in df.columns:
     df["cluster_index"] = df["mutation_index"]

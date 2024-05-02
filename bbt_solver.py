@@ -1,5 +1,5 @@
 from tree_utils import *
-from likelihood_optimizer import *
+from likelihood_optimizer_LP import *
 
 class BBT_solver:
     def __init__(self,V,R,lapprox,EPS,llh_EPS,neg):
@@ -45,10 +45,10 @@ class BBT_solver:
     def main(self,ell,tau=-1):
         self.init()
         for i in range(2,self.n+1):
-            self.iteration()
             if ell > 0:
-                if i >= ell:
-                    return self.BBTs[i]
+                if i-1 >= ell:
+                    return self.BBTs[i-1]
+            self.iteration()
             if tau > 0:
                 if len(self.BBTs[i]) > tau:
                     return self.BBTs[i-1]
