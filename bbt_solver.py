@@ -1,5 +1,13 @@
 from tree_utils import *
-from likelihood_optimizer_LP import *
+# import likelihood_optimizer_LP import *
+def LLH_method(method):
+    global Likelihood_optimizer 
+    if method == "cvxopt":
+        import likelihood_optimizer
+        Likelihood_optimizer = likelihood_optimizer.Likelihood_optimizer
+    elif method == "pLP":
+        import likelihood_optimizer_LP
+        Likelihood_optimizer = likelihood_optimizer_LP.Likelihood_optimizer
 
 class BBT_solver:
     def __init__(self,V,R,lapprox,EPS,llh_EPS,neg):

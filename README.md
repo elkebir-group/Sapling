@@ -8,7 +8,7 @@ Sapling can also grow a given backbone tree into a full phylogeny.
 
 Sapling requires the following python packages:
 * numpy
-* cvxopt
+* cvxopt/gurobipy (at least one, using cvxopt by default, progressive LP (`-L pLP`) is faster but requires gurobipy)
 
 ## I/O Format
 
@@ -32,7 +32,7 @@ More specifically, the first line of the $\ell$ lines includes the number mutati
 #### Infer backbone trees (main program)
 
     Usage:
-      python main.py [-h] -f str -o str -a float [-l int] [-t int] [-m]
+      python main.py [-h] -f str -o str -a float [-l int] [-t int] [-m] [-L str]
     Where:
       -h
          Print a short help message
@@ -48,6 +48,8 @@ More specifically, the first line of the $\ell$ lines includes the number mutati
          tau: upperbound of the number of backbone trees (default: 5)
       -m
          allow multiple evolutions from germline (GL)
+      -L str:
+         method to solve LLH: cvxopt/pLP (default: cvxopt)
 
 Example command:
 `python main.py -f example.tsv -o example.txt -a 0.9`
@@ -57,7 +59,7 @@ Example command:
 #### Expand backbone trees into full trees (greedy expand)
 
     Usage:
-        python greedy_expand.py [-h] -f str -o str -r str -a float [-m]
+        python greedy_expand.py [-h] -f str -o str -r str -a float [-m] [-L str]
     Where:
       -h
          Print a short help message
@@ -71,6 +73,8 @@ Example command:
          rho: lower bound factor of likelihood
       -m
          allow multiple evolutions from germline (GL)
+      -L str:
+         method to solve LLH: cvxopt/pLP (default: cvxopt)
 
 Example command
 `python greedy_expand.py -f example.tsv -r example.txt -o example.full.txt -a 0.9`

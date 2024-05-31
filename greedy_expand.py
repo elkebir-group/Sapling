@@ -5,6 +5,7 @@ from args_handler import *
 from math import log
 
 parameter = handle_args()
+bbt_solver.LLH_method(parameter["L"])
 df = pd.read_csv(parameter["f"],sep="\t")
 approx = float(parameter["a"])
 out = parameter["o"]

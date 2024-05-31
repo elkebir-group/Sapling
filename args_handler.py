@@ -2,7 +2,7 @@ import sys
 
 def handle_args():
     boolean = {"m"}
-    parameter = {"a":0.9,"t":5,"l":-1,"m":False}
+    parameter = {"a":0.9,"t":5,"l":-1,"m":False,"L":"cvxopt"}
     waiting = None
     for arg in sys.argv[1:]:
         if waiting is None:
@@ -20,7 +20,7 @@ def handle_args():
 
 def handle_arg_expand():
     boolean = {"m"}
-    parameter = {"a":0.9,"m":False}
+    parameter = {"a":0.9,"m":False,"L":"cvxopt"}
     waiting = None
     for arg in sys.argv[1:]:
         if waiting is None:
