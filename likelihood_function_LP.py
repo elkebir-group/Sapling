@@ -14,7 +14,7 @@ def log_eps(x,eps=1e-6,s_n=3):
 def mll(V,R,T,env):
     M = np.full_like(V,0.25,dtype=float)
     Range = 0.25
-    n_intervals = 5
+    n_intervals = 10
 
     #build the model for once
     m,n = V.shape
@@ -72,7 +72,7 @@ def mll(V,R,T,env):
 
     #update model #10 iterations are enough
     for __ in range(10):
-        Range*=2/n_intervals
+        Range*=6/n_intervals
         for p in range(m):
             for i in range(n):
                 M[p][i] = f_vars[p][i].X
