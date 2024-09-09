@@ -1,0 +1,23 @@
+	Command being timed: "python ../main.py -f ../Input/Simulations/n100_m10_s18.tsv -o n100_m10_s18_t50.txt -t 50 -L pLP"
+	User time (seconds): 13066.44
+	System time (seconds): 30.62
+	Percent of CPU this job got: 99%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 3:38:27
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 215024
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 16299
+	Voluntary context switches: 11
+	Involuntary context switches: 44424
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 16384
+	Exit status: 0

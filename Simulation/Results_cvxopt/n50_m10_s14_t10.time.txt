@@ -1,0 +1,23 @@
+	Command being timed: "python ../../main.py -f ../Input/n50_m10_s14.tsv -o n50_m10_s14_t10.txt -t 10"
+	User time (seconds): 1021.03
+	System time (seconds): 1346.09
+	Percent of CPU this job got: 94%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 41:56.94
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 100368
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 7871
+	Voluntary context switches: 1
+	Involuntary context switches: 158235830
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 0
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 16384
+	Exit status: 0

@@ -1,0 +1,11 @@
+# 1 backbone trees, 9 mutations
+backbone tree 0, llh: -3579.740054
+-1 0
+0 10
+1 11
+4 16
+8 1
+8 9
+10 8
+11 15
+15 4
