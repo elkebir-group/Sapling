@@ -1,4 +1,5 @@
 from likelihood_function import mll
+import numpy as np
 from tree_utils import *
 
 # parameters = {"zero_adjustment":1e-3}
@@ -22,5 +23,20 @@ class Likelihood_optimizer:
         self.llh_ref[T.edges] = -llh_res["primal objective"]
         return -llh_res["primal objective"]
         
+    def regress(self, T):
+        init_values = [0.1*p/self.n for p in T.subtree_size]*self.m
+        llh_res = mll(self.V[:,T.vertices[1:]],self.R[:,T.vertices[1:]],T.edges_relabel_from_zero,init_values)
+
+        # Extract the solution vector (x variables)
+        x_solution = llh_res['x']
+
+        m = self.V.shape[0]
+        n = len(T.edges)
+
+        # Reshape the solution to match the shape of V and R
+        x_solution = np.array(x_solution).reshape(m, n)
+
+        return x_solution
+
         
 

@@ -2,7 +2,19 @@ import gurobipy as gp
 from gurobipy import GRB
 import numpy as np
 from math import log
+
 def log_eps(x,eps=1e-6,s_n=3):
+    """
+    Computes the natural logarithm of `x` with a smooth approximation for values below `eps`.
+
+    Args:
+        x (float): The input value.
+        eps (float): The threshold below which the approximation is used. Default is 1e-6.
+        s_n (int): The number of terms in the Taylor series approximation. Default is 3.
+
+    Returns:
+        float: The natural logarithm of `x`, or its approximation if `x < eps`.
+    """
     if x < eps:
         return_val = log(eps)
         iter_val = (eps-x)/eps
@@ -12,6 +24,43 @@ def log_eps(x,eps=1e-6,s_n=3):
     return log(x)
 
 def mll(V,R,T,env):
+    """
+    Solves the maximum log-likelihood (MLL) optimization problem for a given tree structure
+    using the Gurobi solver. The function computes the optimal variant frequencies that
+    maximize the log-likelihood of the observed data under the given tree constraints.
+
+    Args:
+        V (numpy.ndarray): A 2D array of size (m_ x n) representing the variant read counts
+                           for each sample and mutation.
+        R (numpy.ndarray): A 2D array of size (m_ x n) representing the reference read counts
+                           for each sample and mutation.
+        T (list): A list of lists representing the tree structure. Each sublist contains
+                  the children of a node, where `T[-1]` represents the root node's children.
+        env (gurobipy.Env): A Gurobi environment configured for optimization.
+
+    Returns:
+        float: The total log-likelihood value for the given data and tree structure.
+
+    Notes:
+        - The function uses piecewise linear approximation to handle the logarithmic terms
+          in the objective function.
+        - The optimization is performed iteratively, refining the search range for the
+          variant frequencies in each iteration.
+        - The Gurobi solver is used to handle the constrained optimization problem.
+
+    Example:
+        Given:
+        ```
+        V = np.array([[10, 5], [20, 10]])
+        R = np.array([[90, 95], [80, 90]])
+        T = [[1], []]  # Tree structure where node 0 is the parent of node 1
+        env = gp.Env(empty=True)
+        env.setParam("OutputFlag", 0)
+        env.start()
+        ```
+
+        The function will return the total log-likelihood value for the given data and tree.
+    """
     tot_answer = 0.
     m_,n = V.shape
     n_intervals = 6
