@@ -9,6 +9,7 @@ Sapling can also grow given backbone trees into full phylogeny. Finally, Sapling
 Sapling requires the following python packages:
 * numpy
 * pandas
+* tqdm
 * one of [cvxopt](https://cvxopt.org)/[gurobipy](https://pypi.org/project/gurobipy/)/[fastppm](https://github.com/elkebir-group/fastppm)
 
 If you choose to use [fastppm](https://github.com/elkebir-group/fastppm), please make sure that the corresponding python library is installed in `$PYTHONPATH`. This includes the current directory. For example:
@@ -17,7 +18,6 @@ If you choose to use [fastppm](https://github.com/elkebir-group/fastppm), please
 ❯ ls -alFh fastppm*
 lrwxr-xr-x 1 melkebir 72 Jan 28 14:33 fastppm.cpython-311-darwin.so -> /Users/melkebir/Projects/fastppm/build/src/fastppm.cpython-311-darwin.so*
 ```
-
 
 ## I/O Format
 
@@ -44,49 +44,45 @@ The first line includes the names of the columns, including:
 
 ## Usage instructions
 
-#### Infer backbone trees
+```
+      usage: sapling.py [-h] [-f F] [--init_trees INIT_TREES] [-o O] [--sep SEP] [-a RHO] [-t TAU] [-l ELL] [--big_expand] [-b BEAM_WIDTH] [-L {cvxopt,pLP,fastppm}] [--alt_roots] [-m] [--use_clusters]
 
-      usage: sapling.py [-h] -f F [--init_trees INIT_TREES] -o O [--sep SEP] [-a RHO]
-                        [-t TAU] [-l ELL] [-s] [-b BEAM_WIDTH] [-L {cvxopt,pLP,fastppm}]
-                        [-m]
-
-      Sapling is an algorithm for summarizing and inferring tumor phylogenies from bulk DNA
-      sequencing data
+      Sapling is an algorithm for summarizing and inferring tumor phylogenies from bulk DNA sequencing data
 
       options:
       -h, --help            show this help message and exit
-      -f F                  Input filename with mutation read counts
+      -f F                  Input filename with mutation read counts (default: STDIN)
       --init_trees INIT_TREES
-                            Initial backbone trees to expand
-      -o O                  Output filename to store trees and frequencies
+                              Input filename with initial backbone trees to expand
+      -o O                  Output filename to store trees and frequencies (default: STDOUT)
       --sep SEP             Input/output column separator (default: \t)
-      -a RHO, --rho RHO     Rho parameter, minimum deviation allowed from max likelihood
-                            (default: 0.9)
+      -a RHO, --rho RHO     Rho parameter, minimum deviation allowed from max likelihood (default: 0.9, ignored when beam_width specified)
       -t TAU, --tau TAU     Tau parameter, maximum number of backbone trees (default: 5)
-      -l ELL, --ell ELL     Ell parameter, minimum number of mutations (default: -1,
-                            unlimited)
-      -s, --small_expand    Use small expand (new mutations are added as leaves, or split
-                            a single edge)
+      -l ELL, --ell ELL     Ell parameter, minimum number of mutations (default: -1, unlimited)
+      --big_expand          Use big expand (new mutations are anywhere, not just as leaves or splitting a single edge)
       -b BEAM_WIDTH, --beam_width BEAM_WIDTH
-                            Maximum beam width (default: -1, limited only by --rho)
+                              Maximum beam width (default: -1, limited only by --rho)
       -L {cvxopt,pLP,fastppm}
-                            Regression method (default: fastppm)
+                              Regression method (default: fastppm)
+      --alt_roots           Explore alternative root nodes
       -m, --poly_clonal_root
-                            Allow poly clonal root node
+                              Allow poly clonal root node
+      --use_clusters        Use provided clustering (taking median read depth and using average frequency for variant counts)
+```
 
 Example command:
 
 `python sapling.py --tau 5 --rho 0.9 < example/example_input.tsv > example/example_output.tsv`
 
-This will output up to `tau=5` backbone trees. [The output](example/example_output.tsv) of the above command on the example input.
+This will output up to `tau=5` backbone trees with a likelihood cut-off of `rho==0.9`. [The output](example/example_output.tsv) of the above command on the example input.
 
 #### Infer full trees
 
 To infer full trees use the following options:
 
-`python sapling.py --tau -1 --ell -1 --rho 0.2 --beam_width 100 < example/example_input.tsv > example/example_full_trees.tsv`
+`python sapling.py --tau -1 --ell -1 --beam_width 100 < example/example_input.tsv > example/example_full_trees.tsv`
 
-This will use a beam width of 100 to attempt to enumerate up to a 100 trees containg all mutations that are a fraction of `1-rho=1-0.2=0.8` away from optimality. [Here](example/example_full_trees) is the output.
+This will use a beam width of 100 to enumerate up to a 100 trees containg all mutations. [Here](example/example_full_trees) is the output.
 
 #### Expand given backbone trees into full trees
 

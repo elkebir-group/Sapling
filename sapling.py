@@ -4,8 +4,9 @@ import numpy as np
 import bbt_solver
 import argparse
 from math import log
+from math import ceil
 
-def parse_input_trees(filename, sep):
+def parse_input_trees(filename, m, n, sep):
     """
     Parses a CSV file containing tree structures and their associated log-likelihood values.
 
@@ -17,11 +18,13 @@ def parse_input_trees(filename, sep):
     Args:
         filename (str): Path to the CSV file containing the tree data.
         sep (str): Delimiter used in the CSV file (e.g., ',' for comma-separated values).
+        m (int): Number of samples
+        n (int): Number of total mutations (in the actual input read count data)
 
     Returns:
         list: A list of tuples, where each tuple contains:
             - A list of edges, where each edge is represented as a tuple (source, target).
-            - The log-likelihood (llh) value associated with the tree.
+            - A tuple of the frequency matrix (F) and the log-likelihood (llh) value associated with the tree.
 
     Raises:
         SystemExit: If the input file does not contain a 'llh' column, the function will
@@ -50,19 +53,23 @@ def parse_input_trees(filename, sep):
         sys.exit(1)
         
     tree_columns = [col for col in df.columns if col.startswith('pi_')]
+    freq_columns = [tuple(map(int, col.split('_')[1:])) for col in df.columns if col.startswith('f_')]
     trees = []
     for idx, row in df.iterrows():
+        F = np.zeros((m,n))
         edges = []
         for col in tree_columns:
             target = int(col.split("_")[1])
             source = int(row[col])
             edges.append((source, target))
+        for col in freq_columns:
+            F[col] = row["f_%d_%d" % col]
         llh = float(row["llh"])
-        trees.append((edges, llh))
+        trees.append((edges, (F, llh)))
     
     return trees
 
-def parse_input(filename, sep):
+def parse_input(filename, sep, ignore_clusters):
     """
     Parses a CSV file containing mutation data and computes matrices for variant counts,
     reference counts, and observed variant frequencies.
@@ -78,6 +85,7 @@ def parse_input(filename, sep):
     Args:
         filename (str): Path to the CSV file containing the mutation data.
         sep (str): Delimiter used in the CSV file (e.g., ',' for comma-separated values).
+        ignore_clusters (bool): Indicator to ignore provided clustering
 
     Returns:
         tuple: A tuple containing four numpy arrays:
@@ -137,30 +145,50 @@ def parse_input(filename, sep):
     if "depth" not in df.columns:
         sys.stderr.write("Error: '%s' does not contain 'depth' column" % filename)
         sys.exit(1)
-    
-    if "cluster_index" not in df.columns:
-        df["cluster_index"] = df["mutation_index"]
-
-    n = len(set(df["cluster_index"]))
-    m = len(set(df["sample_index"]))
-
-    D = np.zeros((m,n),dtype=int)
-    V = np.zeros((m,n),dtype=int)
-    hat_F = np.zeros((m,n))
+        
     df["ff"] = df.apply(lambda x:float(x["var"])/x["depth"],axis = 1)
-    for i in range(m):
-        for p in range(n):
-            D[i][p] = df[(df["sample_index"]==i) & (df["cluster_index"]==p)]["depth"].median()
-            hat_F[i][p] = df[(df["sample_index"]==i) & (df["cluster_index"]==p)]["ff"].mean()
-            V[i][p] = int(D[i][p]*hat_F[i][p])
-
-    R = D-V
     
-    assert D.shape == V.shape == R.shape == hat_F.shape
     
-    return V, R, hat_F
+    if "cluster_index" not in df.columns or ignore_clusters:
+        n = len(set(df["mutation_index"]))
+        m = len(set(df["sample_index"]))
+        
+        D = np.zeros((m,n),dtype=int)
+        V = np.zeros((m,n),dtype=int)
+        hat_F = np.zeros((m,n))
+        for idx, row in df.iterrows():
+            p = int(row["sample_index"])
+            i = int(row["mutation_index"])
+            D[p,i] = row["depth"]
+            V[p,i] = row["var"]
+            
+        hat_F = V / D
+        R = D - V
+        
+        assert D.shape == V.shape == R.shape == hat_F.shape
+        
+        return V, R, hat_F
+    else:
+        n = len(set(df["cluster_index"]))
+        m = len(set(df["sample_index"]))
+        
+        D = np.zeros((m,n),dtype=int)
+        V = np.zeros((m,n),dtype=int)
+        hat_F = np.zeros((m,n))
+        df["ff"] = df.apply(lambda x:float(x["var"])/x["depth"],axis = 1)
+        for p in range(m):
+            for i in range(n):
+                D[p,i] = df[(df["sample_index"]==p) & (df["cluster_index"]==i)]["depth"].median()
+                hat_F[p,i] = df[(df["sample_index"]==p) & (df["cluster_index"]==i)]["ff"].mean()
+                V[p,i] = int(ceil(D[p,i]*hat_F[p,i]))
 
-def process_output(BBTs):
+        R = D-V
+        
+        assert D.shape == V.shape == R.shape == hat_F.shape
+    
+        return V, R, hat_F
+
+def process_output(BBTs, V, R):
     """
     Processes a list of Backbone Trees (BBTs) and their associated log-likelihood values
     into a structured DataFrame. The DataFrame includes tree indices, log-likelihood values,
@@ -196,28 +224,25 @@ def process_output(BBTs):
         ```
     """
     # Extract mutations and number of samples
-    mutations = list(sorted([str(mut) for (_, mut) in BBTs[0][0].edges]))
-    nr_samples = m
+    mutations = BBTs[0][0].vertices[1:]
+    nr_samples = V.shape[0]
 
     # Create a list to store rows of data
     rows = []
 
     # Iterate over BBTs and collect data
-    for i, (t, llh) in enumerate(BBTs):
+    for i, (t, (F, llh)) in enumerate(BBTs):
         # Create a dictionary for the current row
         row = {"tree": i, "llh": llh}
         
         # Add pi values (parent indices) for each mutation
-        for e in sorted(t.edges, key=lambda x: x[1]):
+        for e in sorted(t.edges, key=lambda x: int(x[1])):
             row[f"pi_{e[1]}"] = e[0]
         
-        # Add f values (F matrix) for each sample and mutation
-        F = BBT_solver.solver.regress(t)
         for p in range(nr_samples):
             for mut_idx, mut in enumerate(mutations):
                 row[f"f_{p}_{mut}"] = F[p][mut_idx]
-        
-        # Append the row to the list
+
         rows.append(row)
 
     # Create a DataFrame from the list of rows
@@ -238,13 +263,17 @@ if __name__ == "__main__":
         parser.add_argument("--init_trees", type=str, help="Input filename with initial backbone trees to expand")
         parser.add_argument("-o", type=str, help="Output filename to store trees and frequencies (default: STDOUT)")
         parser.add_argument("--sep", type=str, default="\t", help="Input/output column separator (default: \\t)")
-        parser.add_argument("-a", "--rho", type=float, default=0.9, help="Rho parameter, minimum deviation allowed from max likelihood (default: %(default)s)")
+        parser.add_argument("-a", "--rho", type=float, default=0.9, help="Rho parameter, minimum deviation allowed from max likelihood (default: %(default)s, ignored when beam_width specified)")
         parser.add_argument("-t", "--tau", type=int, default=5, help="Tau parameter, maximum number of backbone trees (default: %(default)s)")
         parser.add_argument("-l", "--ell", type=int, default=-1, help="Ell parameter, minimum number of mutations (default: %(default)s, unlimited)")
-        parser.add_argument("-s", "--small_expand", action="store_true", help="Use small expand (new mutations are added as leaves, or split a single edge)")
+        parser.add_argument("--big_expand", action="store_true", help="Use big expand (new mutations are anywhere, not just as leaves or splitting a single edge)")
         parser.add_argument("-b", "--beam_width", type=int, default=-1, help="Maximum beam width (default: %(default)s, limited only by --rho)")
         parser.add_argument("-L", type=str, default="fastppm", help="Regression method (default: %(default)s)", choices=bbt_solver.choices)
+        parser.add_argument("--alt_roots", action="store_true", help="Explore alternative root nodes")
         parser.add_argument("-m", "--poly_clonal_root", action="store_true", help="Allow poly clonal root node")
+        parser.add_argument("--use_clusters", action="store_true", help="Use provided clustering (taking median read depth and using average frequency for variant counts)")
+        
+        # TODO: add multi-threading
         
         # Parse arguments
         return parser.parse_args()
@@ -254,7 +283,7 @@ if __name__ == "__main__":
 
     # Use the parameters
     bbt_solver.LLH_method(parameter.L)
-    use_big_expand = not(parameter.small_expand)
+    use_big_expand = parameter.big_expand
     
     if parameter.ell > 0:
         #given ell overrides tau
@@ -264,21 +293,22 @@ if __name__ == "__main__":
     llh_EPS = 1e-4
 
     # Parse input
-    V, R, hat_F = parse_input(parameter.f, parameter.sep)
+    V, R, hat_F = parse_input(parameter.f, parameter.sep,not(parameter.use_clusters))
     m, n = V.shape
 
     BBT_solver = bbt_solver.BackboneTreeSolver(V, R, log(parameter.rho),
                                                EPS=EPS, llh_EPS=llh_EPS, poly_clonal_root=parameter.poly_clonal_root, 
-                                               use_big_expand=use_big_expand, beam_width = parameter.beam_width)
+                                               use_big_expand=use_big_expand, beam_width=parameter.beam_width,
+                                               alt_roots=parameter.alt_roots)
 
     if parameter.init_trees is None:
         BBT_solver.init()
     else:
-        init_BBTs = parse_input_trees(parameter.init_trees, parameter.sep)
+        init_BBTs = parse_input_trees(parameter.init_trees, m, n, parameter.sep)
         BBT_solver.init(init_BBTs)
     
     BBTs = BBT_solver.main(parameter.ell, parameter.tau)
-    df = process_output(BBTs)
+    df = process_output(BBTs, V, R)
     
     # Write the DataFrame to a CSV file
     if parameter.o is None:

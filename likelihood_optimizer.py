@@ -2,8 +2,6 @@ from likelihood_function import mll
 import numpy as np
 from tree_utils import *
 
-# parameters = {"zero_adjustment":1e-3}
-
 class Likelihood_optimizer:
     def __init__(self,V,R,EPS):
         """
@@ -15,7 +13,7 @@ class Likelihood_optimizer:
         self.R = R+EPS
         self.llh_ref = {}
 
-    def llh(self,T):
+    def llh(self, T):
         if T.edges in self.llh_ref:
             return self.llh_ref[T.edges]
         init_values = [0.1*p/self.n for p in T.subtree_size]*self.m
@@ -36,7 +34,7 @@ class Likelihood_optimizer:
         # Reshape the solution to match the shape of V and R
         x_solution = np.array(x_solution).reshape(m, n)
 
-        return x_solution
+        return x_solution, -llh_res["primal objective"]
 
         
 
