@@ -2,7 +2,10 @@
 
 Sapling is a method that infers a small set of backbone trees on a smaller subset of mutations that collectively summarize the entire set of possible phylogenies.
 Sapling can also grow given backbone trees into full phylogeny. Finally, Sapling can directly output full phylogenies up to a specified fraction `1-rho` away from optimality.
+
 ![overview](docs/overview.png)
+
+The data repository containing all simulation and real data and results used in the paper can be found ![here](https://github.com/elkebir-group/Sapling-data).
 
 ## Installation
 
