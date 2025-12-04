@@ -5,7 +5,7 @@ Sapling can also grow given backbone trees into full phylogeny. Finally, Sapling
 
 ![overview](docs/overview.png)
 
-The data repository containing all simulation and real data and results used in the paper can be found ![here](https://github.com/elkebir-group/Sapling-data).
+The data repository containing all simulation and real data and results used in the paper can be found [here](https://github.com/elkebir-group/Sapling-data).
 
 ## Installation
 
