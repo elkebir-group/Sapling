@@ -2,7 +2,17 @@
 
 Sapling is a method that infers a small set of backbone trees on a smaller subset of mutations that collectively summarize the entire set of possible phylogenies.
 Sapling can also grow given backbone trees into full phylogeny. Finally, Sapling can directly output full phylogenies up to a specified fraction `1-rho` away from optimality.
-![fig1](Figure1.png)
+![overview](docs/overview.png)
+
+## Installation
+
+To install using `conda`, execute the following command:
+
+```bash
+conda install -c bioconda sapling
+```
+
+This will also install `fastppm`.
 
 ## Dependencies
 
@@ -10,12 +20,12 @@ Sapling requires the following python packages:
 * numpy
 * pandas
 * tqdm
-* one of [cvxopt](https://cvxopt.org)/[gurobipy](https://pypi.org/project/gurobipy/)/[fastppm](https://github.com/elkebir-group/fastppm)
+* one of [cvxopt](https://cvxopt.org)/[gurobipy](https://pypi.org/project/gurobipy/)/[fastppm](https://github.com/elkebir-group/fastppm) (recommended)
 
 If you choose to use [fastppm](https://github.com/elkebir-group/fastppm), please make sure that the corresponding python library is installed in `$PYTHONPATH`. This includes the current directory. For example:
 
-```
-❯ ls -alFh fastppm*
+```bash
+ls -alFh fastppm*
 lrwxr-xr-x 1 melkebir 72 Jan 28 14:33 fastppm.cpython-311-darwin.so -> /Users/melkebir/Projects/fastppm/build/src/fastppm.cpython-311-darwin.so*
 ```
 
