@@ -8,7 +8,6 @@ setup(
         "numpy",
         "pandas",
         "tqdm",
-        "fastppm", 
     ],
     entry_points={
         "console_scripts": [
