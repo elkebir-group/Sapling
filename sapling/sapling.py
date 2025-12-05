@@ -6,6 +6,8 @@ import argparse
 from math import log
 from math import ceil
 
+from . import __version__
+
 def parse_input_trees(filename, m, n, sep):
     """
     Parses a CSV file containing tree structures and their associated log-likelihood values.
@@ -272,7 +274,8 @@ def main():
         parser.add_argument("--alt_roots", action="store_true", help="Explore alternative root nodes")
         parser.add_argument("-m", "--poly_clonal_root", action="store_true", help="Allow poly clonal root node")
         parser.add_argument("--use_clusters", action="store_true", help="Use provided clustering (taking median read depth and using average frequency for variant counts)")
-        
+        parser.add_argument("--version", action="version", version=f"Sapling {__version__}", help="Show program's version number and exit")
+
         # TODO: add multi-threading
         
         # Parse arguments
