@@ -1,6 +1,6 @@
-from likelihood_function import mll
+from .likelihood_function_cvxopt import mll
 import numpy as np
-from tree_utils import *
+from .tree_utils import *
 
 class Likelihood_optimizer:
     def __init__(self,V,R,EPS):
@@ -36,5 +36,25 @@ class Likelihood_optimizer:
 
         return x_solution, -llh_res["primal objective"]
 
+    def regress_multiple_trees(self, trees):
+        """
+        Performs regression to estimate the frequency matrix for given tree structures using CVXOPT.
+
+        Args:
+            trees (list): A list of Tree objects representing the tree structures.
+
+        Returns:
+            list: A list of tuples (frequency_matrix, log_likelihood).
+        """
+        results = []
+        
+        for T in trees:
+            # Call the existing single-tree regress method
+            # This handles the subsetting of V and R and the mll call
+            freq_matrix, log_likelihood = self.regress(T)
+                        
+            results.append((freq_matrix, log_likelihood))
+            
+        return results
         
 

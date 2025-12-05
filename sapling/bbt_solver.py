@@ -1,5 +1,5 @@
 import sys
-from tree_utils import *
+from .tree_utils import *
 from tqdm import tqdm
 
 choices = ["cvxopt", "pLP", "fastppm"]
@@ -20,13 +20,13 @@ def LLH_method(method):
     assert method in choices
     global Likelihood_optimizer 
     if method == "cvxopt":
-        import likelihood_optimizer
-        Likelihood_optimizer = likelihood_optimizer.Likelihood_optimizer
+        from . import likelihood_optimizer_cvxopt
+        Likelihood_optimizer = likelihood_optimizer_cvxopt.Likelihood_optimizer
     elif method == "pLP":
-        import likelihood_optimizer_LP
+        from . import likelihood_optimizer_LP
         Likelihood_optimizer = likelihood_optimizer_LP.Likelihood_optimizer
     elif method == "fastppm":
-        import likelihood_optimizer_fastppm
+        from . import likelihood_optimizer_fastppm
         Likelihood_optimizer = likelihood_optimizer_fastppm.Likelihood_optimizer
 
 

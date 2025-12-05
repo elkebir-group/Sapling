@@ -58,7 +58,7 @@ The first line includes the names of the columns, including:
 ## Usage instructions
 
 ```
-      usage: sapling.py [-h] [-f F] [--init_trees INIT_TREES] [-o O] [--sep SEP] [-a RHO] [-t TAU] [-l ELL] [--big_expand] [-b BEAM_WIDTH] [-L {cvxopt,pLP,fastppm}] [--alt_roots] [-m] [--use_clusters]
+      usage: sapling [-h] [-f F] [--init_trees INIT_TREES] [-o O] [--sep SEP] [-a RHO] [-t TAU] [-l ELL] [--big_expand] [-b BEAM_WIDTH] [-L {cvxopt,pLP,fastppm}] [--alt_roots] [-m] [--use_clusters]
 
       Sapling is an algorithm for summarizing and inferring tumor phylogenies from bulk DNA sequencing data
 
@@ -85,7 +85,9 @@ The first line includes the names of the columns, including:
 
 Example command:
 
-`python sapling.py --tau 5 --rho 0.9 < example/example_input.tsv > example/example_output.tsv`
+```bash
+sapling --tau 5 --rho 0.9 -f example/example_input.tsv > example/example_output.tsv
+```
 
 This will output up to `tau=5` backbone trees with a likelihood cut-off of `rho==0.9`. [The output](example/example_output.tsv) of the above command on the example input.
 
@@ -93,7 +95,9 @@ This will output up to `tau=5` backbone trees with a likelihood cut-off of `rho=
 
 To infer full trees use the following options:
 
-`python sapling.py --tau -1 --ell -1 --beam_width 100 < example/example_input.tsv > example/example_full_trees.tsv`
+```bash
+sapling --tau -1 --ell -1 --beam_width 100 -f example/example_input.tsv > example/example_full_trees.tsv`
+```
 
 This will use a beam width of 100 to enumerate up to a 100 trees containg all mutations. [Here](example/example_full_trees) is the output.
 
@@ -101,6 +105,8 @@ This will use a beam width of 100 to enumerate up to a 100 trees containg all mu
 
 Example command:
 
-`python sapling.py --tau -1 --ell -1 --rho 0.9 --init_trees example/example_output.tsv -f example/example_input.tsv -o example/example_expand.tsv`
+```bash
+sapling --tau -1 --ell -1 --rho 0.9 --init_trees example/example_output.tsv -f example/example_input.tsv -o example/example_expand.tsv
+```
 
 This will expand the [given backbone trees](example/example_output.tsv) into full trees (no restrictions on `tau` and `ell`) that are a factor of `1-rho=1-0.9=0.1` away from optimality. [Here](example/example_expand.tsv) is the output of the above command.

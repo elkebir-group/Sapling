@@ -1,7 +1,7 @@
 import sys
 import pandas as pd
 import numpy as np
-import bbt_solver
+from . import bbt_solver
 import argparse
 from math import log
 from math import ceil
@@ -121,7 +121,7 @@ def parse_input(filename, sep, ignore_clusters):
                  [0.1, 0.1]]
         ```
     """
-    if filename is "-":
+    if filename == "-":
         df = pd.read_csv(sys.stdin, sep=sep)
     else:
         df = pd.read_csv(filename, sep=sep)
@@ -254,7 +254,7 @@ def process_output(BBTs, V, R):
     
     return df
 
-if __name__ == "__main__":
+def main():
     def handle_args():
         parser = argparse.ArgumentParser(description="Sapling is an algorithm for summarizing and inferring tumor phylogenies from bulk DNA sequencing data")
         
@@ -316,3 +316,5 @@ if __name__ == "__main__":
     else:
         df.to_csv(parameter.o, index=False, sep=parameter.sep)
     
+if __name__ == "__main__":
+    main()

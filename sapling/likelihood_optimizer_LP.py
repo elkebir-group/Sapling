@@ -1,6 +1,6 @@
 import gurobipy as gp
 from gurobipy import GRB
-from likelihood_function_LP import mll
+from .likelihood_function_LP import mll
 
 class Likelihood_optimizer:
     """
