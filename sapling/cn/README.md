@@ -42,7 +42,7 @@ The main options are the following.
 | `--workers` | processes that score candidate trees in parallel (default 8) |
 | `--depth`, `--seed` | read depth for a diploid segment, and the seed of the read simulation |
 | `--cn-weight` | weight w_s of the copy-number calls of segment s (default `reads`, see below) |
-| `--kappa`, `--eps` | penalty scale and duality-gap tolerance of fastppm-CN (defaults 1 and 1) |
+| `--kappa`, `--eps` | penalty scale and duality-gap tolerance of fastppm-CN (default: kappa computed from each instance, and a gap of 1) |
 | `--sweeps` | passes of event moves after growing (default 3) |
 | `--dot`, `--json` | output prefix for Graphviz files, and a JSON summary |
 
@@ -138,8 +138,8 @@ Fixing them needs two events to move together, which single-event moves cannot d
 - The copy-count options are capped at 256 per cluster and segment, which could matter in deep subtrees.
 - SNV clusters come from the simulation.
 - The beam keeps the 25 best trees at every step, and the trees on the way to the true tree can rank low before the tree is complete.
-- fastppm-CN uses a fixed curvature penalty with kappa 1.
-  Larger trees converge faster with larger kappa, and the adaptive rules we tried did not help (see `fastppm-dollo/paper/adaptive-penalty.md`).
+- fastppm-CN computes its penalty scale kappa from each instance, as 1 / sqrt(lambda_min lambda_max) of a k by k matrix, and polishes the usages when the gap stalls.
+  Rules that adapt kappa while solving did not help (see `fastppm-dollo/paper/adaptive-penalty.md`).
 - Every solve starts cold.
 
 ## Next steps

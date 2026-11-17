@@ -30,7 +30,7 @@ def assign(data, tree, u, options):
     return np.concatenate(snvs), np.concatenate(rows)
 
 
-def regress(data, tree, snvs, M, kappa=1.0, eps=1.0, max_iterations=20000):
+def regress(data, tree, snvs, M, kappa=-1.0, eps=1.0, max_iterations=20000):
     S = data.num_segments
     st = tree.states(S)
     res = fastppm.regress_copy_number(

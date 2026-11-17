@@ -51,7 +51,7 @@ def _dedupe(items, tree_of=lambda x: x[0]):
 
 
 class Search:
-    def __init__(self, data, beam=25, workers=8, kappa=1.0, eps=1.0, rounds=3, log=print):
+    def __init__(self, data, beam=25, workers=8, kappa=-1.0, eps=1.0, rounds=3, log=print):
         self.data, self.beam, self.log = data, beam, log
         self.events = all_events(data)
         kw = dict(kappa=kappa, eps=eps, rounds=rounds)

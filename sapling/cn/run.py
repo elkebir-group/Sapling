@@ -84,7 +84,7 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--beam", type=int, default=25)
     ap.add_argument("--workers", type=int, default=8)
-    ap.add_argument("--kappa", type=float, default=1.0)
+    ap.add_argument("--kappa", type=float, default=-1.0, help="penalty scale of fastppm-CN (default: computed from each instance)")
     ap.add_argument("--eps", type=float, default=1.0)
     ap.add_argument("--cn-weight", type=str, default="reads",
                     help="w_s: 'reads' (total reads of the SNVs of segment s) or a number")
