@@ -147,59 +147,67 @@ class Tree:
     # ------------------------------------------------------- SNV copy counts
 
     def snv_options(self, w, s, num_segments, cap=256):
-        """Copy-count vectors (over nodes) of an SNV that arises on the edge into w, on segment s.
+        """Copy-count vectors (over nodes) of an SNV that arises on the edge into w, on segment s."""
+        return snv_options(self.states(num_segments)[s], self.children(), self.parent, w, s in self.cn[w], cap)
 
-        The SNV hits one copy of one allele. If the edge into w also changes segment s, the SNV
-        may arise before or after that change. Below w, an amplification of the mutated allele
-        adds 0..delta mutated copies (all of them if every copy is mutated), and a deletion keeps
-        any feasible number of mutated copies. A count that reaches 0 stays 0.
-        """
-        st = self.states(num_segments)[s]
-        ch = self.children()
 
-        def counts(xp, xc, c):
-            if c == 0 or xp == xc:
-                return [c]
-            if c == xp:
-                return [xc]
-            if xc > xp:
-                return list(range(c, c + xc - xp + 1))
-            return list(range(max(0, xc - (xp - c)), min(c, xc) + 1))
+def _counts(xp, xc, c):
+    """Mutated copies in a child with xc copies of the allele, given c of xp in its parent."""
+    if c == 0 or xp == xc:
+        return [c]
+    if c == xp:
+        return [xc]
+    if xc > xp:
+        return list(range(c, c + xc - xp + 1))
+    return list(range(max(0, xc - (xp - c)), min(c, xc) + 1))
 
-        def below(h, x, c):
-            """Assignments [(node, count), ...] for the strict subtree of x, given count c at x."""
-            per_child = []
-            for y in ch[x]:
-                opts = []
-                for cy in counts(st[x][h], st[y][h], c):
-                    for rest in below(h, y, cy):
-                        opts.append([(y, cy)] + rest)
-                        if len(opts) >= cap:
-                            break
-                per_child.append(opts)
-            res = []
-            for combo in product(*per_child):
-                res.append([a for part in combo for a in part])
-                if len(res) >= cap:
-                    break
-            return res or [[]]
 
-        vecs = set()
-        p = self.parent[w]
-        for h in (0, 1):
-            starts = []
-            if st[w][h] >= 1:
-                starts.append(1)                                              # after the change
-            if s in self.cn[w] and st[p][h] >= 1:
-                starts += [c for c in counts(st[p][h], st[w][h], 1) if c >= 1]  # before it
-            for cw in sorted(set(starts)):
-                for rest in below(h, w, cw):
-                    vec = [0] * self.k
-                    vec[w] = cw
-                    for y, cy in rest:
-                        vec[y] = cy
-                    vecs.add(tuple(vec))
-        return np.array(sorted(vecs), dtype=int).reshape(-1, self.k)
+def snv_options(st, ch, parent, w, event_at_w, cap=256):
+    """Copy-count vectors (over nodes) of an SNV that arises on the edge into w.
+
+    st[v] is the state of every node on the segment of the SNV, ch the children lists, and
+    event_at_w whether the edge into w changes the segment. The SNV hits one copy of one
+    allele. If the edge into w also changes the segment, the SNV may arise before or after
+    that change. Below w, an amplification of the mutated allele adds 0..delta mutated copies
+    (all of them if every copy is mutated), and a deletion keeps any feasible number of
+    mutated copies. A count that reaches 0 stays 0.
+    """
+    k = len(parent)
+
+    def below(h, x, c):
+        """Assignments [(node, count), ...] for the strict subtree of x, given count c at x."""
+        per_child = []
+        for y in ch[x]:
+            opts = []
+            for cy in _counts(st[x][h], st[y][h], c):
+                for rest in below(h, y, cy):
+                    opts.append([(y, cy)] + rest)
+                    if len(opts) >= cap:
+                        break
+            per_child.append(opts)
+        res = []
+        for combo in product(*per_child):
+            res.append([a for part in combo for a in part])
+            if len(res) >= cap:
+                break
+        return res or [[]]
+
+    vecs = set()
+    p = parent[w]
+    for h in (0, 1):
+        starts = []
+        if st[w][h] >= 1:
+            starts.append(1)                                                   # after the change
+        if event_at_w and st[p][h] >= 1:
+            starts += [c for c in _counts(st[p][h], st[w][h], 1) if c >= 1]   # before it
+        for cw in sorted(set(starts)):
+            for rest in below(h, w, cw):
+                vec = [0] * k
+                vec[w] = cw
+                for y, cy in rest:
+                    vec[y] = cy
+                vecs.add(tuple(vec))
+    return np.array(sorted(vecs), dtype=int).reshape(-1, k)
 
 
 def from_truth(truth):

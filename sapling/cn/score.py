@@ -36,9 +36,10 @@ def regress(data, tree, snvs, M, kappa=-1.0, eps=1.0, max_iterations=20000):
     res = fastppm.regress_copy_number(
         parent=tree.parent,
         states=[list(st[s]) for s in range(S)],
-        multiplicity=M.tolist(),
-        segment=data.seg[snvs].tolist(),
-        variant=data.v[snvs].tolist(), total=data.d[snvs].tolist(),
+        multiplicity=np.ascontiguousarray(M, dtype=np.int32),
+        segment=np.ascontiguousarray(data.seg[snvs], dtype=np.int32),
+        variant=np.ascontiguousarray(data.v[snvs], dtype=np.int32),
+        total=np.ascontiguousarray(data.d[snvs], dtype=np.int32),
         state_fractions=[[(a, b, float(m)) for (a, b), m in data.mu[s].items()] for s in range(S)],
         mean_copy_number=data.chat.tolist(), segment_weight=data.weight.tolist(),
         kappa=kappa, eps=eps, max_iterations=max_iterations)

@@ -3,6 +3,7 @@
     python -m sapling.cn.run <instance dir> --clones k [--beam 25] [--workers 8]
 
 `--clones true` uses the number of clones of the true tree (the normal clone included).
+The instance needs snvs.tsv and cn.tsv, from clonesim's generatebulk.
 fastppm must be the build of the `copy-number` branch (it provides regress_copy_number).
 """
 import argparse
@@ -80,8 +81,7 @@ def main():
     ap.add_argument("instance")
     ap.add_argument("--clones", type=str, required=True,
                     help="number of clones, the normal clone included (or 'true' for the count of the true tree)")
-    ap.add_argument("--depth", type=int, default=100)
-    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--sample", type=int, default=0, help="sample of snvs.tsv and cn.tsv to use (this prototype takes one)")
     ap.add_argument("--beam", type=int, default=25)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--kappa", type=float, default=-1.0, help="penalty scale of fastppm-CN (default: computed from each instance)")
@@ -93,7 +93,7 @@ def main():
     ap.add_argument("--dot", type=str, help="prefix for <prefix>.true.dot, <prefix>.found.dot and <prefix>.beam<r>.dot")
     a = ap.parse_args()
 
-    data = load_clonesim(a.instance, depth=a.depth, seed=a.seed)
+    data = load_clonesim(a.instance, sample=a.sample)
     if a.cn_weight == "reads":
         data.weight = np.array([float(data.d[data.seg == s].sum()) or 1.0 for s in range(data.num_segments)])
     else:
