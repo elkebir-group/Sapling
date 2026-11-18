@@ -1,1 +1,3 @@
 __pycache__/
+build/
+sapling/cn/_core*.so

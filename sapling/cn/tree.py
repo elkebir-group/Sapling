@@ -102,19 +102,20 @@ class Tree:
 
     def expand(self, event, u, num_segments, new_clone=True, existing=True):
         """Trees with `event` added: on a new clone (a leaf, or splitting an edge) and/or on an
-        existing edge. Returns (tree, initial usages) pairs; a new clone gets index k."""
+        existing edge. Returns (tree, initial usages) pairs; a new clone gets index k. The
+        usages u have the clones on the last axis (one row per sample, or a single vector)."""
         out = []
         if new_clone:
             ch = self.children()
             for p in range(self.k):
                 t = Tree(self.parent + [p], self.clusters + [set()], self.cn + [{}]).place(event, self.k)
-                uu = np.append(u, u[p] / 2)
-                uu[p] /= 2
+                uu = np.append(u, u[..., p:p + 1] / 2, axis=-1)
+                uu[..., p] /= 2
                 out.append((t, uu))
                 for v in ch[p]:
                     t = Tree(self.parent + [p], self.clusters + [set()], self.cn + [{}])
                     t.parent[v] = self.k
-                    out.append((t.place(event, self.k), np.append(u, 0.0)))
+                    out.append((t.place(event, self.k), np.append(u, np.zeros_like(u[..., :1]), axis=-1)))
         if existing:
             for v in range(1, self.k):
                 t = self.place(event, v)
@@ -138,11 +139,11 @@ class Tree:
         if t.clusters[v] or t.cn[v]:
             return t, u, None
         p = t.parent[v]
-        u[p] += u[v]
+        u[..., p] += u[..., v]
         keep = [w for w in range(t.k) if w != v]
         new = {w: j for j, w in enumerate(keep)}
         par = [-1 if t.parent[w] < 0 else new[p if t.parent[w] == v else t.parent[w]] for w in keep]
-        return Tree(par, [t.clusters[w] for w in keep], [t.cn[w] for w in keep]), u[keep], v
+        return Tree(par, [t.clusters[w] for w in keep], [t.cn[w] for w in keep]), u[..., keep], v
 
     # ------------------------------------------------------- SNV copy counts
 
@@ -162,8 +163,10 @@ def _counts(xp, xc, c):
     return list(range(max(0, xc - (xp - c)), min(c, xc) + 1))
 
 
-def snv_options(st, ch, parent, w, event_at_w, cap=256):
-    """Copy-count vectors (over nodes) of an SNV that arises on the edge into w.
+def snv_option_kinds(st, ch, parent, w, event_at_w, cap=256):
+    """Multiplicity vectors (over nodes) of an SNV that arises on the edge into w, each with
+    (before, after): whether it arises from an SNV introduced before the edge's change of the
+    segment, or after it (or with no change on the edge). A vector can come from both.
 
     st[v] is the state of every node on the segment of the SNV, ch the children lists, and
     event_at_w whether the edge into w changes the segment. The SNV hits one copy of one
@@ -192,22 +195,29 @@ def snv_options(st, ch, parent, w, event_at_w, cap=256):
                 break
         return res or [[]]
 
-    vecs = set()
+    kinds = {}
     p = parent[w]
     for h in (0, 1):
-        starts = []
-        if st[w][h] >= 1:
-            starts.append(1)                                                   # after the change
+        after = {1} if st[w][h] >= 1 else set()
+        before = set()
         if event_at_w and st[p][h] >= 1:
-            starts += [c for c in _counts(st[p][h], st[w][h], 1) if c >= 1]   # before it
-        for cw in sorted(set(starts)):
+            before = {c for c in _counts(st[p][h], st[w][h], 1) if c >= 1}
+        for cw in sorted(after | before):
             for rest in below(h, w, cw):
                 vec = [0] * k
                 vec[w] = cw
                 for y, cy in rest:
                     vec[y] = cy
-                vecs.add(tuple(vec))
-    return np.array(sorted(vecs), dtype=int).reshape(-1, k)
+                b0, a0 = kinds.get(tuple(vec), (False, False))
+                kinds[tuple(vec)] = (b0 or cw in before, a0 or cw in after)
+    return kinds
+
+
+def snv_options(st, ch, parent, w, event_at_w, cap=256):
+    """Multiplicity vectors (over nodes) of an SNV that arises on the edge into w, in sorted
+    order (see snv_option_kinds)."""
+    kinds = snv_option_kinds(st, ch, parent, w, event_at_w, cap)
+    return np.array(sorted(kinds), dtype=int).reshape(-1, len(parent))
 
 
 def from_truth(truth):
